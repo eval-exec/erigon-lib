@@ -338,7 +338,7 @@ func (c *Coherent) Get(k []byte, tx kv.Tx, id ViewID) ([]byte, error) {
 	}
 
 	if it != nil {
-		fmt.Printf("from cache:  %#x,%x\n", k, it.(*Element).V)
+		//fmt.Printf("from cache:  %#x,%x\n", k, it.(*Element).V)
 		c.hits.Inc()
 		return it.(*Element).V, nil
 	}
@@ -363,7 +363,7 @@ func (c *Coherent) GetCode(k []byte, tx kv.Tx, id ViewID) ([]byte, error) {
 	}
 
 	if it != nil {
-		fmt.Printf("code from cache:  %#x,%x\n", k, it.(*Element).V)
+		//fmt.Printf("code from cache:  %#x,%x\n", k, it.(*Element).V)
 		c.codeHits.Inc()
 		return it.(*Element).V, nil
 	}
