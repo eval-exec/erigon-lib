@@ -311,7 +311,9 @@ func (c *Coherent) View(ctx context.Context, tx kv.Tx) (CacheView, error) {
 }
 
 func (c *Coherent) getFromCache(k []byte, id ViewID, code bool) (btree.Item, *CoherentRoot, error) {
+	t := time.Now()
 	c.lock.RLock()
+	fmt.Printf("getFromCache got lock in %s\n", time.Since(t))
 	defer c.lock.RUnlock()
 	r, ok := c.roots[id]
 	if !ok {
