@@ -31,6 +31,7 @@ import (
 	"github.com/ledgerwatch/erigon-lib/gointerfaces"
 	"github.com/ledgerwatch/erigon-lib/gointerfaces/remote"
 	"github.com/ledgerwatch/erigon-lib/kv"
+	"github.com/ledgerwatch/log/v3"
 	"go.uber.org/atomic"
 	"golang.org/x/crypto/sha3"
 )
@@ -337,7 +338,7 @@ func (c *Coherent) Get(k []byte, tx kv.Tx, id ViewID) ([]byte, error) {
 	}
 
 	if it != nil {
-		//fmt.Printf("from cache:  %#x,%x\n", k, it.(*Element).V)
+		fmt.Printf("from cache:  %#x,%x\n", k, it.(*Element).V)
 		c.hits.Inc()
 		return it.(*Element).V, nil
 	}
@@ -347,7 +348,7 @@ func (c *Coherent) Get(k []byte, tx kv.Tx, id ViewID) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Printf("from db: %#x,%x\n", k, v)
+	fmt.Printf("from db: %#x,%x\n", k, v)
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -362,7 +363,7 @@ func (c *Coherent) GetCode(k []byte, tx kv.Tx, id ViewID) ([]byte, error) {
 	}
 
 	if it != nil {
-		//fmt.Printf("from cache:  %#x,%x\n", k, it.(*Element).V)
+		fmt.Printf("code from cache:  %#x,%x\n", k, it.(*Element).V)
 		c.codeHits.Inc()
 		return it.(*Element).V, nil
 	}
@@ -372,7 +373,7 @@ func (c *Coherent) GetCode(k []byte, tx kv.Tx, id ViewID) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Printf("from db: %#x,%x\n", k, v)
+	fmt.Printf("code from db: %#x,%x\n", k, v)
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -397,7 +398,7 @@ func (c *Coherent) add(k, v []byte, r *CoherentRoot, id ViewID) *Element {
 	it := &Element{K: k, V: v}
 	replaced := r.cache.ReplaceOrInsert(it)
 	if c.latestViewID != id {
-		//fmt.Printf("add to non-last viewID: %d<%d\n", c.latestViewID, id)
+		fmt.Printf("add to non-last viewID: %d<%d\n", c.latestViewID, id)
 		return it
 	}
 	if replaced != nil {
@@ -415,7 +416,7 @@ func (c *Coherent) addCode(k, v []byte, r *CoherentRoot, id ViewID) *Element {
 	it := &Element{K: k, V: v}
 	replaced := r.codeCache.ReplaceOrInsert(it)
 	if c.latestViewID != id {
-		//fmt.Printf("add to non-last viewID: %d<%d\n", c.latestViewID, id)
+		fmt.Printf("add to non-last viewID: %d<%d\n", c.latestViewID, id)
 		return it
 	}
 	if replaced != nil {
@@ -506,7 +507,7 @@ func (c *Coherent) evictRoots() {
 		}
 		toDel = append(toDel, txId)
 	}
-	//log.Info("forget old roots", "list", fmt.Sprintf("%d", toDel))
+	log.Info("forget old roots", "list", fmt.Sprintf("%d", toDel))
 	for _, txId := range toDel {
 		delete(c.roots, txId)
 	}
