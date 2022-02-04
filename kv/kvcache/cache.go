@@ -313,7 +313,6 @@ func (c *Coherent) View(ctx context.Context, tx kv.Tx) (CacheView, error) {
 func (c *Coherent) getFromCache(k []byte, id ViewID, code bool) (btree.Item, *CoherentRoot, error) {
 	t := time.Now()
 	c.lock.RLock()
-	fmt.Printf("getFromCache got lock in %s\n", time.Since(t))
 	defer c.lock.RUnlock()
 	r, ok := c.roots[id]
 	if !ok {
@@ -350,7 +349,7 @@ func (c *Coherent) Get(k []byte, tx kv.Tx, id ViewID) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("from db: %#x,%x\n", k, v)
+	//fmt.Printf("from db: %#x,%x\n", k, v)
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -375,7 +374,7 @@ func (c *Coherent) GetCode(k []byte, tx kv.Tx, id ViewID) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("code from db: %#x,%x\n", k, v)
+	//fmt.Printf("code from db: %#x,%x\n", k, v)
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -400,7 +399,7 @@ func (c *Coherent) add(k, v []byte, r *CoherentRoot, id ViewID) *Element {
 	it := &Element{K: k, V: v}
 	replaced := r.cache.ReplaceOrInsert(it)
 	if c.latestViewID != id {
-		fmt.Printf("add to non-last viewID: %d<%d\n", c.latestViewID, id)
+		//fmt.Printf("add to non-last viewID: %d<%d\n", c.latestViewID, id)
 		return it
 	}
 	if replaced != nil {
@@ -418,7 +417,7 @@ func (c *Coherent) addCode(k, v []byte, r *CoherentRoot, id ViewID) *Element {
 	it := &Element{K: k, V: v}
 	replaced := r.codeCache.ReplaceOrInsert(it)
 	if c.latestViewID != id {
-		fmt.Printf("add to non-last viewID: %d<%d\n", c.latestViewID, id)
+		//fmt.Printf("add to non-last viewID: %d<%d\n", c.latestViewID, id)
 		return it
 	}
 	if replaced != nil {
